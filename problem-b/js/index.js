@@ -1,6 +1,7 @@
 'use strict';
 
 //Create a variable `form` that refers to the `<form>` element in the DOM.
+let form = document.querySelector('form')
 
 /* Add an event listener to the `form` element that will listen for `'submit'` 
 type events (which occur when the form is submitted). In the callback function 
@@ -19,7 +20,15 @@ for this event listener, do the following:
      attribute a value of `true` (set the attribute directly with dot notation, 
      don't use `setAttribute()`).
 */
-
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+  if (form.checkValidity()) {
+    form.classList.add('d-none');
+    document.querySelector('p.alert').classList.remove('d-none');
+  }
+  form.classList.add('was-validated');
+  document.querySelector('button').disabled = true;
+});
 
 
 /* You should now be able to submit the form and see it highlight fields that 
@@ -60,7 +69,16 @@ The "Date of Birth" should now show an error when empty or if the year is too
 recent; otherwise it should highlight as valid. Note that you'll need to hit
 "Sign me up!" first to enable the validation highlighting!
 */
-
+let type = document.querySelector('#dobInput');
+type.addEventListener('input', function() {
+  let inputAge = getYearsSince(type.value);
+  if(inputAge <  13||inputAge > 200) {
+    type.setCustomValidity("You need to be at least 13 years old.");
+    document.querySelector("#dobFeedback").textContent = "You need to be at least 13 years old.";
+  } else {
+    type.setCustomValidity('');
+  }
+})
 
 
 /* Next you'll make sure the two "password" fields match. Start by defining a
@@ -77,13 +95,26 @@ function `validatePasswordMatch()`. This function should access both password
   also blank (an empty string).
 */
 
+let password = document.querySelector('#passwordInput');
+let passwordCheck = document.querySelector('#passwordConfirmInput');
+
+function validatePasswordMatch() { 
+  if (password.value == passwordCheck.value) {
+    passwordCheck.setCustomValidity('');
+    document.querySelector('#passwordConfirmFeedback').textContent = '';
+  } else {
+    passwordCheck.setCustomValidity('Passwords do not match');
+    document.querySelector('#passwordConfirmFeedback').textContent = 'Passwords do not match';
+  }
+}
 
 
 /* Assign the `validatePasswordMatch` function as the callback for `input` 
 events that happen on BOTH the `#passwordInput` and `#passwordConfirmInput`
 elements. You can select the elements individually or using `querySelectorAll()`.
 */
-
+document.querySelector('#passwordInput').addEventListener('input', validatePasswordMatch);
+document.querySelector('#passwordConfirmInput').addEventListener('input', validatePasswordMatch);
 
 
 /* Last you'll need to only enable the "submit" button if the form is valid. Use
@@ -98,6 +129,15 @@ This should disable the button until all of the fields are valid, but only after
 the user tries to submit once (which is a polite user experience)
 */
 
+document.querySelectorAll('input').forEach(function(input) {
+  input.addEventListener('input', function() {
+    if (form.classList.contains('was-validated')) {
+      document.querySelector('button').disabled = true;
+    } else {
+      document.querySelector('button').disabled = false;
+    }
+  })
+})
 
 
 
